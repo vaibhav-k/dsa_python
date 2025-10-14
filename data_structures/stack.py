@@ -1,43 +1,103 @@
 """
-This module provides a simple implementation of a stack data structure using Python classes.
-The stack follows the Last-In-First-Out (LIFO) principle and supports common operations such as:
-
-- push: Add an item to the top of the stack
-- pop: Remove and return the top item
-- peek: View the top item without removing it
-- is_empty: Check if the stack is empty
-- size: Get the number of items in the stack
-
-The Stack class is designed to be reusable and easy to integrate into larger applications.
-It includes error handling for empty stack operations and a string representation for debugging.
-
-Example usage:
-    stack = Stack()
-    stack.push(1)
-    stack.push(2)
-    print(stack.pop())  # Output: 2
+This module provides a simple implementation of a stack data structure
+using Python classes. The stack follows the Last-In-First-Out (LIFO)
+principle and supports common operations.
 
 Author: Vaibhav Kulshrestha
-Date: 10/04/2025
+Date: 10/14/2025
 """
+
 
 class Stack:
     """
     A class representing a stack data structure (LIFO - Last In, First Out).
+
+    Attributes:
+        _items (list): Internal list to store stack items.
     """
 
     def __init__(self):
-        """
-        Initialize an empty stack.
-        """
+        """Initialize an empty stack."""
         self._items = []
+
+    def __str__(self):
+        """
+        Return a string representation of the stack from top to bottom.
+
+        Returns:
+            str: Stack from top to bottom.
+        """
+        return f"Stack (top -> bottom): {self._items[::-1]}"
+
+    def size(self):
+        """
+        Return the number of items in the stack.
+
+        Returns:
+            int: Size of the stack.
+        """
+        return len(self._items)
+
+    def __len__(self):
+        """Return the number of items in the stack."""
+        return self.size()
+
+    def __contains__(self, item):
+        """
+        Check if an item is in the stack.
+
+        Args:
+            item: The item to check for.
+
+        Returns:
+            bool: True if item is in the stack, False otherwise.
+        """
+        if not self._items:
+            return False
+        return item in self._items
+
+    def __iter__(self):
+        """Return an iterator over the stack from bottom to top."""
+        return iter(self._items)
+
+    def __getitem__(self, index):
+        """
+        Get an item by index from the stack.
+
+        Args:
+            index (int): Index of the item to retrieve.
+
+        Returns:
+            Any: The item at the specified index.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0 or index >= self.size():
+            raise IndexError("stack index out of range")
+        return self._items[index]
+
+    def __setitem__(self, index, value):
+        """
+        Set an item at a specific index in the stack.
+
+        Args:
+            index (int): Index to set.
+            value: Value to set.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0 or index >= self.size():
+            raise IndexError("stack index out of range")
+        self._items[index] = value
 
     def push(self, item):
         """
         Add an item to the top of the stack.
 
-        Parameters:
-        item: The item to be added to the stack.
+        Args:
+            item: The item to be added.
         """
         self._items.append(item)
 
@@ -46,10 +106,10 @@ class Stack:
         Remove and return the top item of the stack.
 
         Returns:
-        The item at the top of the stack.
+            Any: The item at the top.
 
         Raises:
-        IndexError: If the stack is empty.
+            IndexError: If the stack is empty.
         """
         if self.is_empty():
             raise IndexError("pop from empty stack")
@@ -60,10 +120,10 @@ class Stack:
         Return the top item of the stack without removing it.
 
         Returns:
-        The item at the top of the stack.
+            Any: The item at the top.
 
         Raises:
-        IndexError: If the stack is empty.
+            IndexError: If the stack is empty.
         """
         if self.is_empty():
             raise IndexError("peek from empty stack")
@@ -74,36 +134,79 @@ class Stack:
         Check if the stack is empty.
 
         Returns:
-        True if the stack is empty, False otherwise.
+            bool: True if the stack is empty, False otherwise.
         """
         return len(self._items) == 0
 
-    def size(self):
+    def clear(self):
+        """Remove all items from the stack."""
+        self._items.clear()
+
+    def to_list(self):
         """
-        Return the number of items in the stack.
+        Convert the stack to a list.
 
         Returns:
-        The size of the stack.
+            list: Items in the stack from bottom to top.
         """
-        return len(self._items)
+        return self._items.copy()
 
-    def __str__(self):
+    @classmethod
+    def from_list(cls, lst):
         """
-        Return a string representation of the stack.
+        Create a stack from a list.
+
+        Args:
+            lst (list): Items to initialize the stack.
 
         Returns:
-        A string showing the stack from bottom to top.
+            Stack: Stack instance containing the items.
         """
-        return f"Stack (bottom -> top): {str(self._items)}"
+        stack = cls()
+        stack._items = list(lst)
+        return stack
+
+    def search(self, item):
+        """
+        Search for an item and return its position from the top.
+
+        Args:
+            item: The item to search for.
+
+        Returns:
+            int: 1-based position from the top, or -1 if not found.
+        """
+        try:
+            index = self._items[::-1].index(item)
+            return index + 1
+        except ValueError:
+            return -1
+
+    def extend(self, iterable):
+        """
+        Extend the stack by pushing all items from an iterable.
+
+        Args:
+            iterable: Items to be added to the stack.
+        """
+        for item in iterable:
+            self.push(item)
+
+
+def main():
+    """Demonstrate the Stack class functionality."""
+    stack = Stack()
+    stack.push(1)
+    stack.push(2)
+    stack.push(3)
+    print(stack)             # Stack (top -> bottom): [3, 2, 1]
+    print(stack.peek())      # 3
+    print(stack.pop())       # 3
+    print(stack.size())      # 2
+    print(stack.is_empty())  # False
+    stack.clear()
+    print(stack.is_empty())  # True
 
 
 if __name__ == "__main__":
-    stack = Stack()
-    stack.push(10)
-    stack.push(20)
-    stack.push(30)
-    print(stack)             # Stack (bottom -> top): [10, 20, 30]
-    print(stack.peek())      # 30
-    print(stack.pop())       # 30
-    print(stack.size())      # 2
-    print(stack.is_empty())  # False
+    main()

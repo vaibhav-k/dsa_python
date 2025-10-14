@@ -1,25 +1,34 @@
 """
-This module provides a simple implementation of a doubly linked list using Python classes.
-The doubly linked list supports common operations such as:
+double_linked_list.py
+---------------------
+A simple implementation of a doubly linked list for Python.
 
-- append: Add an item to the end of the list
-- prepend: Add an item to the beginning of the list
-- delete: Remove an item by value
-- find: Search for an item by value
-- display_forward: Print all items from head to tail
-- display_backward: Print all items from tail to head
-- size: Get the number of items in the list
+Features:
+    - append(data): Add an item to the end of the list.
+    - prepend(data): Add an item to the beginning of the list.
+    - delete(data): Remove the first item by value.
+    - find(data): Search for an item by value.
+    - display_forward(): Print all items from head to tail.
+    - display_backward(): Print all items from tail to head.
+    - size(): Get the number of items in the list.
+    - clear(): Remove all items from the list.
+    - to_list(): Return a copy of the list as a Python list.
+    - from_list(lst): Create a linked list from a Python list.
+    - search(data): Return the 1-based position of an item, or -1 if not found.
+    - extend(iterable): Add multiple items from an iterable.
+    - __len__, __contains__, __iter__, __getitem__, __setitem__.
 
-The DoublyLinkedList class is designed to be reusable and easy to integrate into larger applications.
-It includes error handling for empty list operations and a string representation for debugging.
+Author:
+    Vaibhav Kulshrestha
 
-Author: Vaibhav Kulshrestha
-Date: 10/04/2025
+Date:
+    2025-14-10
 """
+
 
 class Node:
     """
-    Represents a node in a doubly linked list.
+    A node in a doubly linked list.
 
     Attributes:
         data: The value stored in the node.
@@ -41,15 +50,118 @@ class Node:
 
 class DoublyLinkedList:
     """
-    A class representing a doubly linked list.
+    A doubly linked list implementation.
+
+    Attributes:
+        head (Node): The first node in the list.
+        tail (Node): The last node in the list.
     """
 
     def __init__(self):
-        """
-        Initialize an empty doubly linked list.
-        """
+        """Initialize an empty doubly linked list."""
         self.head = None
         self.tail = None
+
+    def __str__(self):
+        """Return a string representation of the list."""
+        return f"DoublyLinkedList: {' <-> '.join(map(str, self.to_list()))}"
+
+    def size(self):
+        """
+        Count the number of nodes in the list.
+
+        Returns:
+            int: The total number of nodes.
+        """
+        return sum(1 for _ in self)
+
+    def __len__(self):
+        """Return the number of nodes in the list."""
+        return self.size()
+
+    def find(self, data):
+        """
+        Search for a node with the given data.
+
+        Args:
+            data: The value to search for.
+
+        Returns:
+            bool: True if found, False otherwise.
+        """
+        current = self.head
+        while current:
+            if current.data == data:
+                return True
+            current = current.next
+        return False
+
+    def __contains__(self, item):
+        """
+        Check if an item is in the list.
+
+        Args:
+            item: The value to check for.
+
+        Returns:
+            bool: True if found, False otherwise.
+        """
+        if not self.head:
+            return False
+        return self.find(item)
+
+    def __iter__(self):
+        """Iterate over the list from head to tail."""
+        current = self.head
+        while current:
+            yield current.data
+            current = current.next
+
+    def __getitem__(self, index):
+        """
+        Get the item at a specific index.
+
+        Args:
+            index (int): The index to retrieve.
+
+        Returns:
+            The value at the specified index.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0:
+            raise IndexError("Negative index not supported")
+        current = self.head
+        for _ in range(index):
+            if not current:
+                raise IndexError("list index out of range")
+            current = current.next
+        if not current:
+            raise IndexError("list index out of range")
+        return current.data
+
+    def __setitem__(self, index, value):
+        """
+        Set the value at a specific index.
+
+        Args:
+            index (int): The index to set.
+            value: The value to assign.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0:
+            raise IndexError("Negative index not supported")
+        current = self.head
+        for _ in range(index):
+            if not current:
+                raise IndexError("list index out of range")
+            current = current.next
+        if not current:
+            raise IndexError("list index out of range")
+        current.data = value
 
     def append(self, data):
         """
@@ -62,7 +174,6 @@ class DoublyLinkedList:
         if not self.head:
             self.head = self.tail = new_node
             return
-
         self.tail.next = new_node
         new_node.prev = self.tail
         self.tail = new_node
@@ -78,20 +189,19 @@ class DoublyLinkedList:
         if not self.head:
             self.head = self.tail = new_node
             return
-
         new_node.next = self.head
         self.head.prev = new_node
         self.head = new_node
 
     def delete(self, data):
         """
-        Delete the first node with the specified data.
+        Delete the first node with the given data.
 
         Args:
             data: The value to be removed.
 
         Raises:
-            ValueError: If the value is not found.
+            ValueError: If the data is not found.
         """
         current = self.head
         while current:
@@ -100,62 +210,84 @@ class DoublyLinkedList:
                     current.prev.next = current.next
                 else:
                     self.head = current.next
-
                 if current.next:
                     current.next.prev = current.prev
                 else:
                     self.tail = current.prev
-
                 return
             current = current.next
         raise ValueError(f"{data} not found in the list")
 
-    def find(self, data):
+    def clear(self):
+        """Remove all nodes from the list."""
+        self.head = None
+        self.tail = None
+
+    def to_list(self):
         """
-        Search for a node with the specified data.
+        Convert the linked list to a Python list.
+
+        Returns:
+            list: List of node values.
+        """
+        result = []
+        current = self.head
+        while current:
+            result.append(current.data)
+            current = current.next
+        return result
+
+    @classmethod
+    def from_list(cls, lst):
+        """
+        Create a doubly linked list from a Python list.
+
+        Args:
+            lst (list): List of values.
+
+        Returns:
+            DoublyLinkedList: Linked list containing the values.
+        """
+        dll = cls()
+        for item in lst:
+            dll.append(item)
+        return dll
+
+    def search(self, data):
+        """
+        Search for an item and return its 1-based position, or -1 if not found.
 
         Args:
             data: The value to search for.
 
         Returns:
-            bool: True if found, False otherwise.
+            int: 1-based position, or -1 if not found.
         """
         current = self.head
+        pos = 1
         while current:
             if current.data == data:
-                return True
+                return pos
             current = current.next
-        return False
+            pos += 1
+        return -1
 
-    def size(self):
+    def extend(self, iterable):
         """
-        Count the number of nodes in the list.
+        Add multiple items from an iterable to the end of the list.
 
-        Returns:
-            int: The number of nodes.
+        Args:
+            iterable: Items to add.
         """
-        count = 0
-        current = self.head
-        while current:
-            count += 1
-            current = current.next
-        return count
+        for item in iterable:
+            self.append(item)
 
     def display_forward(self):
-        """
-        Print the list from head to tail.
-        """
-        nodes = []
-        current = self.head
-        while current:
-            nodes.append(str(current.data))
-            current = current.next
-        print(f"Forward: {' <-> '.join(nodes)}")
+        """Print all nodes from head to tail."""
+        print(f"Forward: {' <-> '.join(map(str, self.to_list()))}")
 
     def display_backward(self):
-        """
-        Print the list from tail to head.
-        """
+        """Print all nodes from tail to head."""
         nodes = []
         current = self.tail
         while current:
@@ -164,14 +296,26 @@ class DoublyLinkedList:
         print(f"Backward: {' <-> '.join(nodes)}")
 
 
-if __name__ == "__main__":
+def main():
+    """Demonstrate the DoublyLinkedList class functionality."""
     dll = DoublyLinkedList()
     dll.append(10)
     dll.append(20)
     dll.prepend(5)
-    dll.display_forward()    # Forward: 5 <-> 10 <-> 20
-    dll.display_backward()   # Backward: 20 <-> 10 <-> 5
-    print(dll.find(10))      # True
+    dll.display_forward()   # Forward: 5 <-> 10 <-> 20
+    dll.display_backward()  # Backward: 20 <-> 10 <-> 5
+    print(dll.find(10))     # True
     dll.delete(10)
-    dll.display_forward()    # Forward: 5 <-> 20
-    print(dll.size())        # 2
+    dll.display_forward()   # Forward: 5 <-> 20
+    print(dll.size())       # 2
+    dll.extend([30, 40])
+    dll.display_forward()   # Forward: 5 <-> 20 <-> 30 <-> 40
+    print(dll.search(40))   # 4
+    print(dll.to_list())    # [5, 20, 30, 40]
+    dll.clear()
+    print(len(dll))         # 0
+    print(list(dll))        # []
+
+
+if __name__ == "__main__":
+    main()

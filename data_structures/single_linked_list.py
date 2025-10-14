@@ -1,24 +1,37 @@
 """
-This module provides a simple implementation of a singly linked list using Python classes.
-The singly linked list supports common operations such as:
+single_linked_list.py
+---------------------
+A simple implementation of a singly linked list for Python.
 
-- append: Add an item to the end of the list
-- prepend: Add an item to the beginning of the list
-- delete: Remove an item by value
-- find: Search for an item by value
-- display: Print all items in the list
-- size: Get the number of items in the list
+Features:
+    - append(data): Add an item to the end of the list.
+    - prepend(data): Add an item to the beginning of the list.
+    - delete(data): Remove the first item by value.
+    - find(data): Search for an item by value.
+    - display(): Print all items in the list.
+    - size(): Get the number of items in the list.
+    - clear(): Remove all items from the list.
+    - to_list(): Return a copy of the list as a Python list.
+    - from_list(lst): Create a linked list from a Python list.
+    - search(data): Return the 1-based position of an item, or -1 if not found.
+    - extend(iterable): Add multiple items from an iterable.
+    - __len__, __contains__, __iter__, __getitem__, __setitem__.
 
-The LinkedList class is designed to be reusable and easy to integrate into larger applications.
-It includes error handling for empty list operations and a string representation for debugging.
+Author:
+    Vaibhav Kulshrestha
 
-Author: Vaibhav Kulshrestha
-Date: 10/04/2025
+Date:
+    2025-14-10
 """
+
 
 class Node:
     """
-    A class representing a node in a singly linked list.
+    A node in a singly linked list.
+
+    Attributes:
+        data: The value stored in the node.
+        next: Reference to the next node.
     """
 
     def __init__(self, data):
@@ -34,27 +47,126 @@ class Node:
 
 class LinkedList:
     """
-    A class representing a singly linked list.
+    A singly linked list implementation.
+
+    Attributes:
+        head (Node): The first node in the list.
     """
 
     def __init__(self):
-        """
-        Initialize an empty linked list.
-        """
+        """Initialize an empty linked list."""
         self.head = None
+
+    def __str__(self):
+        """Return a string representation of the list."""
+        return f"LinkedList: {' -> '.join(map(str, self.to_list()))}"
+
+    def size(self):
+        return sum(1 for _ in self)
+
+    def __len__(self):
+        """Return the number of nodes in the list."""
+        return self.size()
+
+    def find(self, data):
+        """
+        Search for a node with the given data.
+
+        Args:
+            data: The value to search for.
+
+        Returns:
+            bool: True if found, False otherwise.
+        """
+        if not self.head:
+            return False
+        current = self.head
+        while current:
+            if current.data == data:
+                return True
+            current = current.next
+        return False
+
+    def __contains__(self, item):
+        """
+        Check if an item is in the list.
+
+        Args:
+            item: The value to check for.
+
+        Returns:
+            bool: True if found, False otherwise.
+        """
+        if not self.head:
+            return False
+        return self.find(item)
+
+    def __iter__(self):
+        """Iterate over the list from head to tail."""
+        current = self.head
+        while current:
+            yield current.data
+            current = current.next
+
+    def __getitem__(self, index):
+        """
+        Get the item at a specific index.
+
+        Args:
+            index (int): The index to retrieve.
+
+        Returns:
+            The value at the specified index.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0:
+            raise IndexError("Negative index not supported")
+        current = self.head
+        for _ in range(index):
+            if not current:
+                raise IndexError("list index out of range")
+            current = current.next
+        if not current:
+            raise IndexError("list index out of range")
+        return current.data
+
+    def __setitem__(self, index, value):
+        """
+        Set the value at a specific index.
+
+        Args:
+            index (int): The index to set.
+            value: The value to assign.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0:
+            raise IndexError("Negative index not supported")
+        if not self.head:
+            raise IndexError("list index out of range")
+        current = self.head
+        for _ in range(index):
+            if not current:
+                raise IndexError("list index out of range")
+            current = current.next
+        if not current:
+            raise IndexError("list index out of range")
+        current.data = value
 
     def append(self, data):
         """
         Add a node with the given data to the end of the list.
 
         Args:
-            data: The value to be added to the list.
+            data: The value to be added.
         """
         new_node = Node(data)
         if not self.head:
             self.head = new_node
             return
-
         current = self.head
         while current.next:
             current = current.next
@@ -65,12 +177,12 @@ class LinkedList:
         Add a node with the given data to the beginning of the list.
 
         Args:
-            data: The value to be added to the list.
-
-        Args:
-            data: The value to be added to the list.
+            data: The value to be added.
         """
         new_node = Node(data)
+        if not self.head:
+            self.head = new_node
+            return
         new_node.next = self.head
         self.head = new_node
 
@@ -79,77 +191,111 @@ class LinkedList:
         Delete the first node with the given data.
 
         Args:
-            data: The value to be removed from the list.
+            data: The value to be deleted.
 
         Raises:
             ValueError: If the list is empty or the value is not found.
         """
         if not self.head:
             raise ValueError("List is empty")
-
         if self.head.data == data:
             self.head = self.head.next
             return
-
         current = self.head
         while current.next and current.next.data != data:
             current = current.next
-
         if not current.next:
             raise ValueError(f"{data} not found in the list")
-
         current.next = current.next.next
 
-    def find(self, data):
+    def clear(self):
+        """Remove all nodes from the list."""
+        self.head = None
+
+    def to_list(self):
         """
-        Search for a node with the given data.
+        Convert the linked list to a Python list.
+
+        Returns:
+            list: List of node values.
+        """
+        result = []
+        current = self.head
+        while current:
+            result.append(current.data)
+            current = current.next
+        return result
+
+    @classmethod
+    def from_list(cls, lst):
+        """
+        Create a linked list from a Python list.
+
+        Args:
+            lst (list): List of values.
+
+        Returns:
+            LinkedList: Linked list containing the values.
+        """
+        ll = cls()
+        for item in lst:
+            ll.append(item)
+        return ll
+
+    def search(self, data):
+        """
+        Search for an item and return its 1-based position, or -1 if not found.
+        Returns the position of the first occurrence of the item.
 
         Args:
             data: The value to search for.
 
         Returns:
-        True if found, False otherwise.
+            int: 1-based position, or -1 if not found.
         """
         current = self.head
+        pos = 1
         while current:
             if current.data == data:
-                return True
+                return pos
             current = current.next
-        return False
+            pos += 1
+        return -1
 
-    def size(self):
+    def extend(self, iterable):
         """
-        Count the number of nodes in the list.
+        Add multiple items from an iterable to the end of the list.
 
-        Returns:
-            int: The total number of nodes.
+        Args:
+            iterable: Items to add.
         """
-        count = 0
-        current = self.head
-        while current:
-            count += 1
-            current = current.next
-        return count
+        for item in iterable:
+            self.append(item)
 
     def display(self):
-        """
-        Print all nodes in the list.
-        """
-        nodes = []
-        current = self.head
-        while current:
-            nodes.append(str(current.data))
-            current = current.next
-        print(f"LinkedList: {' -> '.join(nodes)}")
+        """Print all nodes in the list."""
+        print(self.__str__())
 
 
-if __name__ == "__main__":
+def main():
+    """Demonstrate the LinkedList class functionality."""
     ll = LinkedList()
     ll.append(10)
     ll.append(20)
     ll.prepend(5)
-    ll.display()           # LinkedList: 5 -> 10 -> 20
-    print(ll.find(10))     # True
+    ll.display()          # LinkedList: 5 -> 10 -> 20
+    print(ll.find(10))    # True
     ll.delete(10)
-    ll.display()           # LinkedList: 5 -> 20
-    print(ll.size())       # 2
+    ll.display()          # LinkedList: 5 -> 20
+    print(ll.size())      # 2
+    ll.extend([30, 40])
+    ll.display()          # LinkedList: 5 -> 20 -> 30 -> 40
+    print(ll.search(40))  # 4
+    print(ll.to_list())   # [5, 20, 30, 40]
+    ll.clear()
+    print(len(ll))        # 0
+    print(list(ll))       # []
+
+
+if __name__ == "__main__":
+    main()

@@ -1,43 +1,118 @@
 """
-This module provides a simple implementation of a queue data structure using Python classes.
-The queue follows the First-In-First-Out (FIFO) principle and supports common operations such as:
+queue.py
+--------
+A simple implementation of a queue data structure (FIFO) for Python.
 
-- enqueue: Add an item to the rear of the queue
-- dequeue: Remove and return the front item
-- peek: View the front item without removing it
-- is_empty: Check if the queue is empty
-- size: Get the number of items in the queue
+Features:
+    - enqueue(item): Add an item to the rear of the queue.
+    - dequeue(): Remove and return the front item.
+    - peek(): View the front item without removing it.
+    - is_empty(): Check if the queue is empty.
+    - size(): Get the number of items in the queue.
+    - clear(): Remove all items from the queue.
+    - to_list(): Return a copy of the queue as a list.
+    - from_list(lst): Create a queue from a list.
+    - search(item): Return the 1-based position of an item from the front, or -1 if not found.
+    - extend(iterable): Add multiple items to the rear from an iterable.
 
-The Queue class is designed to be reusable and easy to integrate into larger applications.
-It includes error handling for empty queue operations and a string representation for debugging.
+Author:
+    Vaibhav Kulshrestha
 
-Example usage:
-    queue = Queue()
-    queue.enqueue(1)
-    queue.enqueue(2)
-    print(queue.dequeue())  # Output: 1
-
-Author: Vaibhav Kulshrestha
-Date: 10/04/2025
+Date:
+    2025-14-10
 """
+
 
 class Queue:
     """
     A class representing a queue data structure (FIFO - First In, First Out).
+
+    Attributes:
+        _items (list): Internal list to store queue items.
     """
 
     def __init__(self):
-        """
-        Initialize an empty queue.
-        """
+        """Initialize an empty queue."""
         self._items = []
+
+    def __str__(self):
+        """
+        Return a string representation of the queue (front -> rear).
+
+        Returns:
+            str: Queue from front to rear.
+        """
+        return f"Queue (front -> rear): {self._items}"
+
+    def size(self):
+        """
+        Return the number of items in the queue.
+
+        Returns:
+            int: Size of the queue.
+        """
+        return len(self._items)
+
+    def __len__(self):
+        """Return the number of items in the queue (len(queue))."""
+        return self.size()
+
+    def __contains__(self, item):
+        """
+        Check if an item is in the queue.
+
+        Args:
+            item: The item to check for.
+
+        Returns:
+            bool: True if item is in the queue, False otherwise.
+        """
+        if not self._items:
+            return False
+        return item in self._items
+
+    def __iter__(self):
+        """Return an iterator over the queue from front to rear."""
+        return iter(self._items)
+
+    def __getitem__(self, index):
+        """
+        Get an item by index from the queue.
+
+        Args:
+            index (int): Index of the item to retrieve.
+
+        Returns:
+            Any: The item at the specified index.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0 or index >= self.size():
+            raise IndexError("queue index out of range")
+        return self._items[index]
+
+    def __setitem__(self, index, value):
+        """
+        Set an item at a specific index in the queue.
+
+        Args:
+            index (int): Index to set.
+            value: Value to set.
+
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if index < 0 or index >= self.size():
+            raise IndexError("queue index out of range")
+        self._items[index] = value
 
     def enqueue(self, item):
         """
         Add an item to the rear of the queue.
 
-        Parameters:
-        item: The item to be added to the queue.
+        Args:
+            item: The item to be added.
         """
         self._items.append(item)
 
@@ -46,10 +121,10 @@ class Queue:
         Remove and return the front item of the queue.
 
         Returns:
-        The item at the front of the queue.
+            Any: The item at the front.
 
         Raises:
-        IndexError: If the queue is empty.
+            IndexError: If the queue is empty.
         """
         if self.is_empty():
             raise IndexError("dequeue from empty queue")
@@ -60,10 +135,10 @@ class Queue:
         Return the front item of the queue without removing it.
 
         Returns:
-        The item at the front of the queue.
+            Any: The item at the front.
 
         Raises:
-        IndexError: If the queue is empty.
+            IndexError: If the queue is empty.
         """
         if self.is_empty():
             raise IndexError("peek from empty queue")
@@ -74,30 +149,67 @@ class Queue:
         Check if the queue is empty.
 
         Returns:
-        True if the queue is empty, False otherwise.
+            bool: True if the queue is empty, False otherwise.
         """
         return len(self._items) == 0
 
-    def size(self):
+    def clear(self):
+        """Remove all items from the queue."""
+        self._items.clear()
+
+    def to_list(self):
         """
-        Return the number of items in the queue.
+        Convert the queue to a list.
 
         Returns:
-        The size of the queue.
+            list: Items in the queue from front to rear.
         """
-        return len(self._items)
+        return self._items.copy()
 
-    def __str__(self):
+    @classmethod
+    def from_list(cls, lst):
         """
-        Return a string representation of the queue.
+        Create a queue from a list.
+
+        Args:
+            lst (list): Items to initialize the queue.
 
         Returns:
-        A string showing the queue from front to rear.
+            Queue: Queue instance containing the items.
         """
-        return f"Queue (front -> rear): {str(self._items)}"
+        queue = cls()
+        queue._items = list(lst)
+        return queue
+
+    def search(self, item):
+        """
+        Search for an item and return its position from the front.
+
+        Args:
+            item: The item to search for.
+
+        Returns:
+            int: 1-based position from the front, or -1 if not found.
+        """
+        try:
+            index = self._items.index(item)
+            return index + 1
+        except ValueError:
+            return -1
+
+    def extend(self, iterable):
+        """
+        Extend the queue by adding all items from an iterable to the rear.
+
+        Args:
+            iterable: Items to be added to the queue.
+        """
+        for item in iterable:
+            self.enqueue(item)
 
 
-if __name__ == "__main__":
+def main():
+    """Demonstrate the Queue class functionality."""
     queue = Queue()
     queue.enqueue(10)
     queue.enqueue(20)
@@ -107,3 +219,12 @@ if __name__ == "__main__":
     print(queue.dequeue())   # 10
     print(queue.size())      # 2
     print(queue.is_empty())  # False
+    queue.extend([40, 50])
+    print(queue)             # Queue (front -> rear): [20, 30, 40, 50]
+    print(queue.search(30))  # 2
+    queue.clear()
+    print(queue.is_empty())  # True
+
+
+if __name__ == "__main__":
+    main()
