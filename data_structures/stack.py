@@ -1,10 +1,25 @@
 """
-This module provides a simple implementation of a stack data structure
-using Python classes. The stack follows the Last-In-First-Out (LIFO)
-principle and supports common operations.
+data_structures.stack
+----------------------
+A simple implementation of a stack data structure (LIFO) for Python.
 
-Author: Vaibhav Kulshrestha
-Date: 10/14/2025
+Features:
+    - push(item): Add an item to the top of the stack.
+    - pop(): Remove and return the top item.
+    - peek(): View the top item without removing it.
+    - is_empty(): Check if the stack is empty.
+    - size(): Get the number of items in the stack.
+    - clear(): Remove all items from the stack.
+    - to_list(): Return a copy of the stack as a list.
+    - from_list(lst): Create a stack from a list.
+    - search(item): Return the 1-based position of an item from the top, or -1 if not found.
+    - extend(iterable): Add multiple items to the top from an iterable.
+
+Author:
+    Vaibhav Kulshrestha
+
+Date:
+    10/14/2025
 """
 
 

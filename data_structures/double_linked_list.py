@@ -1,5 +1,5 @@
 """
-double_linked_list.py
+data_structures.double_linked_list
 ---------------------
 A simple implementation of a doubly linked list for Python.
 

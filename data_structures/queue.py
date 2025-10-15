@@ -1,5 +1,5 @@
 """
-queue.py
+data_structures.queue
 --------
 A simple implementation of a queue data structure (FIFO) for Python.
 
