@@ -1,6 +1,7 @@
 """
 data_structures.single_linked_list
----------------------
+==================================
+
 A simple implementation of a singly linked list for Python.
 
 Features:

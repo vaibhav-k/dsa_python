@@ -1,6 +1,7 @@
 """
 data_structures.stack
-----------------------
+=====================
+
 A simple implementation of a stack data structure (LIFO) for Python.
 
 Features:
