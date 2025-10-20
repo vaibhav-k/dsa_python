@@ -23,7 +23,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-10
+    2025-14-20
 """
 
 
@@ -90,6 +90,8 @@ class DoublyLinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
+        if not self.head or not data:  # Empty list or None data
+            return False
         current = self.head
         while current:
             if current.data == data:
@@ -107,7 +109,7 @@ class DoublyLinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
-        if not self.head:
+        if not self.head or not item:  # Empty list or None item
             return False
         return self.find(item)
 
@@ -131,8 +133,8 @@ class DoublyLinkedList:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0:
-            raise IndexError("Negative index not supported")
+        if index < 0 or index >= self.size():
+            raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
             if not current:
@@ -153,8 +155,8 @@ class DoublyLinkedList:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0:
-            raise IndexError("Negative index not supported")
+        if index < 0 or index >= self.size():
+            raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
             if not current:
@@ -171,6 +173,8 @@ class DoublyLinkedList:
         Args:
             data: The value to be added.
         """
+        if not data:  # Ignore None or empty data
+            return
         new_node = Node(data)
         if not self.head:
             self.head = self.tail = new_node
@@ -186,6 +190,8 @@ class DoublyLinkedList:
         Args:
             data: The value to be added.
         """
+        if not data:  # Ignore None or empty data
+            return
         new_node = Node(data)
         if not self.head:
             self.head = self.tail = new_node
@@ -202,8 +208,12 @@ class DoublyLinkedList:
             data: The value to be removed.
 
         Raises:
-            ValueError: If the data is not found.
+            ValueError: If the list is empty or data not found.
         """
+        if not self.head:
+            raise ValueError("List is empty")
+        if not data:
+            raise ValueError("Cannot delete None or empty data")
         current = self.head
         while current:
             if current.data == data:
@@ -249,6 +259,8 @@ class DoublyLinkedList:
         Returns:
             DoublyLinkedList: Linked list containing the values.
         """
+        if not lst:  # Empty list
+            return cls()
         dll = cls()
         for item in lst:
             dll.append(item)
@@ -303,19 +315,19 @@ def main():
     dll.append(10)
     dll.append(20)
     dll.prepend(5)
-    dll.display_forward()   # Forward: 5 <-> 10 <-> 20
+    dll.display_forward()  # Forward: 5 <-> 10 <-> 20
     dll.display_backward()  # Backward: 20 <-> 10 <-> 5
-    print(dll.find(10))     # True
+    print(dll.find(10))  # True
     dll.delete(10)
-    dll.display_forward()   # Forward: 5 <-> 20
-    print(dll.size())       # 2
+    dll.display_forward()  # Forward: 5 <-> 20
+    print(dll.size())  # 2
     dll.extend([30, 40])
-    dll.display_forward()   # Forward: 5 <-> 20 <-> 30 <-> 40
-    print(dll.search(40))   # 4
-    print(dll.to_list())    # [5, 20, 30, 40]
+    dll.display_forward()  # Forward: 5 <-> 20 <-> 30 <-> 40
+    print(dll.search(40))  # 4
+    print(dll.to_list())  # [5, 20, 30, 40]
     dll.clear()
-    print(len(dll))         # 0
-    print(list(dll))        # []
+    print(len(dll))  # 0
+    print(list(dll))  # []
 
 
 if __name__ == "__main__":

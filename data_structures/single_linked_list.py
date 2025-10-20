@@ -22,7 +22,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-10
+    2025-14-20
 """
 
 
@@ -79,7 +79,7 @@ class LinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
-        if not self.head:
+        if not self.head or not data:  # Empty list or None data
             return False
         current = self.head
         while current:
@@ -98,8 +98,6 @@ class LinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
-        if not self.head:
-            return False
         return self.find(item)
 
     def __iter__(self):
@@ -120,10 +118,12 @@ class LinkedList:
             The value at the specified index.
 
         Raises:
-            IndexError: If the index is out of range.
+            IndexError: If the index is out of range or the list is empty.
         """
-        if index < 0:
-            raise IndexError("Negative index not supported")
+        if index < 0 or index >= self.size():
+            raise IndexError("list index out of range")
+        if not self.head:
+            raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
             if not current:
@@ -144,26 +144,25 @@ class LinkedList:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0:
-            raise IndexError("Negative index not supported")
-        if not self.head:
+        if index < 0 or index >= self.size():
             raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
-            if not current:
-                raise IndexError("list index out of range")
             current = current.next
-        if not current:
-            raise IndexError("list index out of range")
         current.data = value
 
-    def append(self, data):
+    def append(self, data=None):
         """
         Add a node with the given data to the end of the list.
 
         Args:
             data: The value to be added.
+
+        Raises:
+            ValueError: If data is None or empty.
         """
+        if not data:
+            raise ValueError("Cannot append None or empty data")
         new_node = Node(data)
         if not self.head:
             self.head = new_node
@@ -173,13 +172,18 @@ class LinkedList:
             current = current.next
         current.next = new_node
 
-    def prepend(self, data):
+    def prepend(self, data=None):
         """
         Add a node with the given data to the beginning of the list.
 
         Args:
             data: The value to be added.
+
+        Raises:
+            ValueError: If data is None or empty.
         """
+        if not data:
+            raise ValueError("Cannot prepend None or empty data")
         new_node = Node(data)
         if not self.head:
             self.head = new_node
@@ -203,11 +207,12 @@ class LinkedList:
             self.head = self.head.next
             return
         current = self.head
-        while current.next and current.next.data != data:
+        while current.next:
+            if current.next.data == data:
+                current.next = current.next.next
+                return
             current = current.next
-        if not current.next:
-            raise ValueError(f"{data} not found in the list")
-        current.next = current.next.next
+        raise ValueError(f"{data} not found in the list")
 
     def clear(self):
         """Remove all nodes from the list."""
@@ -220,6 +225,8 @@ class LinkedList:
         Returns:
             list: List of node values.
         """
+        if not self.head:  # Empty list
+            return []
         result = []
         current = self.head
         while current:
@@ -238,9 +245,12 @@ class LinkedList:
         Returns:
             LinkedList: Linked list containing the values.
         """
+        if not lst:  # Empty list
+            return cls()
         ll = cls()
         for item in lst:
-            ll.append(item)
+            if item is not None:
+                ll.append(item)
         return ll
 
     def search(self, data):
@@ -254,6 +264,8 @@ class LinkedList:
         Returns:
             int: 1-based position, or -1 if not found.
         """
+        if not self.head or not data:  # Empty list or None/empty data
+            return -1
         current = self.head
         pos = 1
         while current:
@@ -275,7 +287,7 @@ class LinkedList:
 
     def display(self):
         """Print all nodes in the list."""
-        print(self.__str__())
+        print(self)
 
 
 def main():
@@ -284,18 +296,18 @@ def main():
     ll.append(10)
     ll.append(20)
     ll.prepend(5)
-    ll.display()          # LinkedList: 5 -> 10 -> 20
-    print(ll.find(10))    # True
+    ll.display()  # LinkedList: 5 -> 10 -> 20
+    print(ll.find(10))  # True
     ll.delete(10)
-    ll.display()          # LinkedList: 5 -> 20
-    print(ll.size())      # 2
+    ll.display()  # LinkedList: 5 -> 20
+    print(ll.size())  # 2
     ll.extend([30, 40])
-    ll.display()          # LinkedList: 5 -> 20 -> 30 -> 40
+    ll.display()  # LinkedList: 5 -> 20 -> 30 -> 40
     print(ll.search(40))  # 4
-    print(ll.to_list())   # [5, 20, 30, 40]
+    print(ll.to_list())  # [5, 20, 30, 40]
     ll.clear()
-    print(len(ll))        # 0
-    print(list(ll))       # []
+    print(len(ll))  # 0
+    print(list(ll))  # []
 
 
 if __name__ == "__main__":

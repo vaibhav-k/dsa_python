@@ -20,7 +20,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    10/14/2025
+    2025-14-20
 """
 
 
@@ -152,7 +152,7 @@ class Stack:
         Returns:
             bool: True if the stack is empty, False otherwise.
         """
-        return len(self._items) == 0
+        return self.size() == 0
 
     def clear(self):
         """Remove all items from the stack."""
@@ -163,9 +163,9 @@ class Stack:
         Convert the stack to a list.
 
         Returns:
-            list: Items in the stack from bottom to top.
+            list: Items in the stack from top to bottom.
         """
-        return self._items.copy()
+        return self._items[::-1].copy()  # Return a copy with top item first
 
     @classmethod
     def from_list(cls, lst):
@@ -176,10 +176,10 @@ class Stack:
             lst (list): Items to initialize the stack.
 
         Returns:
-            Stack: Stack instance containing the items.
+            Stack: Stack instance containing the items (top of stack is last element of list).
         """
         stack = cls()
-        stack._items = list(lst)
+        stack._items = list(lst)[::-1]  # Reverse to have last element as top
         return stack
 
     def search(self, item):
@@ -204,7 +204,12 @@ class Stack:
 
         Args:
             iterable: Items to be added to the stack.
+
+        Raises:
+            ValueError: If the iterable is empty.
         """
+        if not iterable:
+            raise ValueError("iterable is empty")
         for item in iterable:
             self.push(item)
 
@@ -215,10 +220,10 @@ def main():
     stack.push(1)
     stack.push(2)
     stack.push(3)
-    print(stack)             # Stack (top -> bottom): [3, 2, 1]
-    print(stack.peek())      # 3
-    print(stack.pop())       # 3
-    print(stack.size())      # 2
+    print(stack)  # Stack (top -> bottom): [3, 2, 1]
+    print(stack.peek())  # 3
+    print(stack.pop())  # 3
+    print(stack.size())  # 2
     print(stack.is_empty())  # False
     stack.clear()
     print(stack.is_empty())  # True

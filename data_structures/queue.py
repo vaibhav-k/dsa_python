@@ -20,7 +20,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-10
+    2025-14-20
 """
 
 
@@ -152,7 +152,7 @@ class Queue:
         Returns:
             bool: True if the queue is empty, False otherwise.
         """
-        return len(self._items) == 0
+        return self.size() == 0
 
     def clear(self):
         """Remove all items from the queue."""
@@ -165,7 +165,7 @@ class Queue:
         Returns:
             list: Items in the queue from front to rear.
         """
-        return self._items.copy()
+        return self._items.copy()  # Return a copy of the list from front to rear
 
     @classmethod
     def from_list(cls, lst):
@@ -179,7 +179,7 @@ class Queue:
             Queue: Queue instance containing the items.
         """
         queue = cls()
-        queue._items = list(lst)
+        queue._items.extend(lst)  # Maintain order from front to rear
         return queue
 
     def search(self, item):
@@ -192,6 +192,8 @@ class Queue:
         Returns:
             int: 1-based position from the front, or -1 if not found.
         """
+        if self.is_empty():  # Short-circuit if empty
+            return -1
         try:
             index = self._items.index(item)
             return index + 1
@@ -204,7 +206,12 @@ class Queue:
 
         Args:
             iterable: Items to be added to the queue.
+
+        Raises:
+            ValueError: If the iterable is empty.
         """
+        if not iterable:
+            raise ValueError("iterable is empty")
         for item in iterable:
             self.enqueue(item)
 
@@ -215,13 +222,13 @@ def main():
     queue.enqueue(10)
     queue.enqueue(20)
     queue.enqueue(30)
-    print(queue)             # Queue (front -> rear): [10, 20, 30]
-    print(queue.peek())      # 10
-    print(queue.dequeue())   # 10
-    print(queue.size())      # 2
+    print(queue)  # Queue (front -> rear): [10, 20, 30]
+    print(queue.peek())  # 10
+    print(queue.dequeue())  # 10
+    print(queue.size())  # 2
     print(queue.is_empty())  # False
     queue.extend([40, 50])
-    print(queue)             # Queue (front -> rear): [20, 30, 40, 50]
+    print(queue)  # Queue (front -> rear): [20, 30, 40, 50]
     print(queue.search(30))  # 2
     queue.clear()
     print(queue.is_empty())  # True

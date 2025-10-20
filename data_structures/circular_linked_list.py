@@ -15,7 +15,6 @@ Features of CircularLinkedList:
     - to_list(): Convert the circular linked list to a standard Python list.
     - clear(): Remove all nodes from the list.
     - is_empty(): Check if the list is empty.
-    - size(): Get the number of nodes in the list.
     - find(data): Find a node with the given data.
     - display(): Print the elements of the list.
     - from_list(data_list): Class method to create a CircularLinkedList from a standard Python list.
@@ -25,7 +24,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-17
+    2025-14-20
 """
 
 
@@ -65,7 +64,7 @@ class CircularLinkedList:
 
     def add(self, data):
         """
-        Add a node with the given data to the list.
+        Add a node with the given data to the list at the end.
 
         Args:
             data: The value to be added to the list.
@@ -73,6 +72,8 @@ class CircularLinkedList:
         Returns:
             None: Adds a new node to the circular linked list.
         """
+        if not data:
+            return
         new_node = Node(data)
         if not self.head:
             self.head = new_node
@@ -95,19 +96,20 @@ class CircularLinkedList:
         Returns:
             bool: True if the node was found and removed, False otherwise.
         """
-        if not self.head:
+        if not self.head or data is None:
             return False
 
         current = self.head
         prev = None
 
-        while True:
+        for _ in range(self.size):
             if current.data == data:
                 if prev:
                     prev.next = current.next
+                    if current == self.head:
+                        self.head = current.next
                 else:
-                    # Removing the head node
-                    if current.next == self.head:
+                    if self.size == 1:
                         self.head = None
                     else:
                         tail = self.head
@@ -117,11 +119,9 @@ class CircularLinkedList:
                         tail.next = self.head
                 self.size -= 1
                 return True
-
             prev = current
             current = current.next
-
-            if current == self.head:
+            if current is None:
                 break
 
         return False
@@ -170,15 +170,6 @@ class CircularLinkedList:
             bool: True if the list is empty, False otherwise.
         """
         return self.size == 0
-
-    def size(self):
-        """
-        Get the number of nodes in the circular linked list.
-
-        Returns:
-            int: The number of nodes in the list.
-        """
-        return self.size
 
     def find(self, data):
         """
@@ -276,6 +267,8 @@ class CircularLinkedList:
         """
         if index < 0 or index >= self.size:
             raise IndexError("Index out of bounds")
+        if self.size == 0:
+            raise IndexError("Index out of bounds")
 
         current = self.head
         for _ in range(index):
@@ -310,18 +303,14 @@ def main():
     cll.add(1)
     cll.add(2)
     cll.add(3)
-    cll.display()  # Output: 1 -> 2 -> 3 (circular)
-
-    print(f"Size: {len(cll)}")  # Output: Size: 3
-
+    cll.display()                     # Output: 1 -> 2 -> 3 (circular)
+    print(f"Size: {len(cll)}")        # Output: Size: 3
     cll.remove(2)
-    cll.display()  # Output: 1 -> 3 (circular)
-
+    cll.display()                     # Output: 1 -> 3 (circular)
     print(f"Contains 3: {3 in cll}")  # Output: Contains 3: True
     print(f"Contains 2: {2 in cll}")  # Output: Contains 2: False
-
     cll.clear()
-    cll.display()  # Output: List is empty
+    cll.display()                     # Output: List is empty
 
 
 if __name__ == "__main__":
