@@ -20,7 +20,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-20
+    2025-10-31
 """
 
 
@@ -68,8 +68,6 @@ class Queue:
         Returns:
             bool: True if item is in the queue, False otherwise.
         """
-        if not self._items:
-            return False
         return item in self._items
 
     def __iter__(self):
@@ -89,24 +87,52 @@ class Queue:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0 or index >= self.size():
-            raise IndexError("queue index out of range")
-        return self._items[index]
+        if isinstance(index, int):
+            size = self.size()
+            if index < 0:
+                index += size
+            if index < 0 or index >= size:
+                raise IndexError(
+                    f"queue index out of range: {index} (valid range: 0 to {size - 1})"
+                )
+            return self._items[index]
+        elif isinstance(index, slice):
+            # Support slicing
+            return self._items[index]
+        else:
+            raise TypeError(
+                "queue indices must be integers or slices, not {}".format(
+                    type(index).__name__
+                )
+            )
 
     def __setitem__(self, index, value):
         """
         Set an item at a specific index in the queue.
 
         Args:
-            index (int): Index to set.
-            value: Value to set.
+            index (int or slice): Index or slice to set.
+            value: Value to set (or iterable for slice).
 
         Raises:
             IndexError: If the index is out of range.
+            TypeError: If index is not int or slice.
         """
-        if index < 0 or index >= self.size():
-            raise IndexError("queue index out of range")
-        self._items[index] = value
+        if isinstance(index, int):
+            size = self.size()
+            if index < 0:
+                index += size
+            if index < 0 or index >= size:
+                raise IndexError("queue index out of range")
+            self._items[index] = value
+        elif isinstance(index, slice):
+            self._items[index] = value
+        else:
+            raise TypeError(
+                "queue indices must be integers or slices, not {}".format(
+                    type(index).__name__
+                )
+            )
 
     def enqueue(self, item):
         """
@@ -168,18 +194,19 @@ class Queue:
         return self._items.copy()  # Return a copy of the list from front to rear
 
     @classmethod
-    def from_list(cls, lst):
+    def from_iterable(cls, iterable):
         """
-        Create a queue from a list.
+        Create a queue from any iterable.
 
         Args:
-            lst (list): Items to initialize the queue.
+            iterable: An iterable of items to be added to the queue.
 
         Returns:
-            Queue: Queue instance containing the items.
+            Queue: Queue instance containing the items in order.
         """
         queue = cls()
-        queue._items.extend(lst)  # Maintain order from front to rear
+        for item in iterable:
+            queue.enqueue(item)  # Maintain order from front to rear
         return queue
 
     def search(self, item):
@@ -192,8 +219,6 @@ class Queue:
         Returns:
             int: 1-based position from the front, or -1 if not found.
         """
-        if self.is_empty():  # Short-circuit if empty
-            return -1
         try:
             index = self._items.index(item)
             return index + 1
@@ -206,13 +231,14 @@ class Queue:
 
         Args:
             iterable: Items to be added to the queue.
-
-        Raises:
-            ValueError: If the iterable is empty.
         """
-        if not iterable:
-            raise ValueError("iterable is empty")
-        for item in iterable:
+        iterator = iter(iterable)
+        try:
+            first_item = next(iterator)
+        except StopIteration:
+            return  # Iterable is empty, do nothing
+        self.enqueue(first_item)
+        for item in iterator:
             self.enqueue(item)
 
 
@@ -222,16 +248,23 @@ def main():
     queue.enqueue(10)
     queue.enqueue(20)
     queue.enqueue(30)
+
     print(queue)  # Queue (front -> rear): [10, 20, 30]
     print(queue.peek())  # 10
     print(queue.dequeue())  # 10
     print(queue.size())  # 2
     print(queue.is_empty())  # False
+
     queue.extend([40, 50])
     print(queue)  # Queue (front -> rear): [20, 30, 40, 50]
     print(queue.search(30))  # 2
+    print(queue.search(0))  # 2
+
     queue.clear()
     print(queue.is_empty())  # True
+
+    queue_from_list = Queue.from_iterable([1, 2, 3])
+    print(queue_from_list)  # Queue (front -> rear): [1, 2, 3]
 
 
 if __name__ == "__main__":

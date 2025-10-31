@@ -20,7 +20,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-20
+    2025-10-31
 """
 
 
@@ -68,7 +68,7 @@ class Stack:
         Returns:
             bool: True if item is in the stack, False otherwise.
         """
-        if not self._items:
+        if not self._items:  # Early exit for empty stack
             return False
         return item in self._items
 
@@ -89,6 +89,14 @@ class Stack:
         Raises:
             IndexError: If the index is out of range.
         """
+        if not self._items:  # Early exit for empty stack
+            raise IndexError("stack index out of range")
+        if (
+            not isinstance(index, int) or index < 0 or index >= len(self._items)
+        ):  # Validate index
+            raise IndexError("stack index out of range")
+        if index < 0:
+            index += self.size()
         if index < 0 or index >= self.size():
             raise IndexError("stack index out of range")
         return self._items[index]
@@ -104,7 +112,11 @@ class Stack:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0 or index >= self.size():
+        if not self._items:  # Early exit for empty stack
+            raise IndexError("stack index out of range")
+        if (
+            index < 0 or index >= self.size() or not isinstance(index, int)
+        ):  # Validate index
             raise IndexError("stack index out of range")
         self._items[index] = value
 
@@ -168,18 +180,19 @@ class Stack:
         return self._items[::-1].copy()  # Return a copy with top item first
 
     @classmethod
-    def from_list(cls, lst):
+    def from_iterable(cls, iterable):
         """
-        Create a stack from a list.
+        Create a stack from any iterable.
 
         Args:
-            lst (list): Items to initialize the stack.
+            iterable: An iterable of items to be added to the stack.
 
         Returns:
             Stack: Stack instance containing the items (top of stack is last element of list).
         """
         stack = cls()
-        stack._items = list(lst)[::-1]  # Reverse to have last element as top
+        for item in iterable:
+            stack.push(item)  # Push items in order
         return stack
 
     def search(self, item):
@@ -193,10 +206,12 @@ class Stack:
             int: 1-based position from the top, or -1 if not found.
         """
         try:
-            index = self._items[::-1].index(item)
-            return index + 1
-        except ValueError:
-            return -1
+            for idx, val in enumerate(reversed(self._items)):
+                if val == item:
+                    return idx + 1
+        except IndexError:
+            pass
+        return -1
 
     def extend(self, iterable):
         """
@@ -220,13 +235,24 @@ def main():
     stack.push(1)
     stack.push(2)
     stack.push(3)
+
     print(stack)  # Stack (top -> bottom): [3, 2, 1]
     print(stack.peek())  # 3
     print(stack.pop())  # 3
     print(stack.size())  # 2
     print(stack.is_empty())  # False
+
     stack.clear()
     print(stack.is_empty())  # True
+
+    stack_from_list = Stack.from_list([4, 5, 6])
+    print(stack_from_list)  # Stack (top -> bottom): [6, 5, 4]
+    print(stack_from_list.to_list())  # [6, 5, 4]
+    print(stack_from_list.search(5))  # 2
+    print(stack_from_list.search(0))  # 2
+
+    stack_from_list.extend([7, 8])
+    print(stack_from_list)  # Stack (top -> bottom): [8, 7, 6, 5, 4]
 
 
 if __name__ == "__main__":

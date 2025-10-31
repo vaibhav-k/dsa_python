@@ -22,7 +22,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-20
+    2025-10-31
 """
 
 
@@ -58,6 +58,22 @@ class LinkedList:
         """Initialize an empty linked list."""
         self.head = None
 
+    def to_list(self):
+        """
+        Convert the linked list to a Python list.
+
+        Returns:
+            list: List of node values.
+        """
+        if not self.head:  # Empty list
+            return []
+        result = []
+        current = self.head
+        while current:
+            result.append(current.data)
+            current = current.next
+        return result
+
     def __str__(self):
         """Return a string representation of the list."""
         return f"LinkedList: {' -> '.join(map(str, self.to_list()))}"
@@ -79,7 +95,7 @@ class LinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
-        if not self.head or not data:  # Empty list or None data
+        if not self.head or data is None:  # Empty list or None data
             return False
         current = self.head
         while current:
@@ -119,18 +135,17 @@ class LinkedList:
 
         Raises:
             IndexError: If the index is out of range or the list is empty.
+            TypeError: If the index is not an integer.
         """
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
         if index < 0 or index >= self.size():
-            raise IndexError("list index out of range")
-        if not self.head:
             raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
             if not current:
                 raise IndexError("list index out of range")
             current = current.next
-        if not current:
-            raise IndexError("list index out of range")
         return current.data
 
     def __setitem__(self, index, value):
@@ -143,7 +158,10 @@ class LinkedList:
 
         Raises:
             IndexError: If the index is out of range.
+            TypeError: If the index is not an integer.
         """
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
         if index < 0 or index >= self.size():
             raise IndexError("list index out of range")
         current = self.head
@@ -151,7 +169,7 @@ class LinkedList:
             current = current.next
         current.data = value
 
-    def append(self, data=None):
+    def append(self, data):
         """
         Add a node with the given data to the end of the list.
 
@@ -161,7 +179,7 @@ class LinkedList:
         Raises:
             ValueError: If data is None or empty.
         """
-        if not data:
+        if data is None:
             raise ValueError("Cannot append None or empty data")
         new_node = Node(data)
         if not self.head:
@@ -172,7 +190,7 @@ class LinkedList:
             current = current.next
         current.next = new_node
 
-    def prepend(self, data=None):
+    def prepend(self, data):
         """
         Add a node with the given data to the beginning of the list.
 
@@ -182,7 +200,7 @@ class LinkedList:
         Raises:
             ValueError: If data is None or empty.
         """
-        if not data:
+        if data is None:
             raise ValueError("Cannot prepend None or empty data")
         new_node = Node(data)
         if not self.head:
@@ -199,10 +217,12 @@ class LinkedList:
             data: The value to be deleted.
 
         Raises:
-            ValueError: If the list is empty or the value is not found.
+            ValueError: If the list is empty or data not found.
         """
         if not self.head:
             raise ValueError("List is empty")
+        if data is None:
+            raise ValueError("Cannot delete None or empty data")
         if self.head.data == data:
             self.head = self.head.next
             return
@@ -218,37 +238,19 @@ class LinkedList:
         """Remove all nodes from the list."""
         self.head = None
 
-    def to_list(self):
-        """
-        Convert the linked list to a Python list.
-
-        Returns:
-            list: List of node values.
-        """
-        if not self.head:  # Empty list
-            return []
-        result = []
-        current = self.head
-        while current:
-            result.append(current.data)
-            current = current.next
-        return result
-
     @classmethod
-    def from_list(cls, lst):
+    def from_iterable(cls, iterable):
         """
-        Create a linked list from a Python list.
+        Create a linked list from any iterable.
 
         Args:
-            lst (list): List of values.
+            iterable: An iterable of values.
 
         Returns:
             LinkedList: Linked list containing the values.
         """
-        if not lst:  # Empty list
-            return cls()
         ll = cls()
-        for item in lst:
+        for item in iterable:
             if item is not None:
                 ll.append(item)
         return ll
@@ -264,7 +266,7 @@ class LinkedList:
         Returns:
             int: 1-based position, or -1 if not found.
         """
-        if not self.head or not data:  # Empty list or None/empty data
+        if not self.head or data is None:  # Empty list or None/empty data
             return -1
         current = self.head
         pos = 1
@@ -282,8 +284,11 @@ class LinkedList:
         Args:
             iterable: Items to add.
         """
+        if iterable is None:  # Exit if iterable is None
+            return
         for item in iterable:
-            self.append(item)
+            if item is not None:
+                self.append(item)
 
     def display(self):
         """Print all nodes in the list."""
@@ -296,18 +301,24 @@ def main():
     ll.append(10)
     ll.append(20)
     ll.prepend(5)
-    ll.display()  # LinkedList: 5 -> 10 -> 20
-    print(ll.find(10))  # True
+    ll.display()                                                        # LinkedList: 5 -> 10 -> 20
+
+    print(ll.find(10))                                                  # True
     ll.delete(10)
-    ll.display()  # LinkedList: 5 -> 20
-    print(ll.size())  # 2
+    ll.display()                                                        # LinkedList: 5 -> 20
+
+print(ll.size())                                                        # 2
     ll.extend([30, 40])
-    ll.display()  # LinkedList: 5 -> 20 -> 30 -> 40
-    print(ll.search(40))  # 4
-    print(ll.to_list())  # [5, 20, 30, 40]
+    ll.display()                                                        # LinkedList: 5 -> 20 -> 30 -> 40
+
+    print(ll.search(40))                                                # 4
+    print(ll.to_list())                                                 # [5, 20, 30, 40]
     ll.clear()
-    print(len(ll))  # 0
-    print(list(ll))  # []
+    print(len(ll))                                                      # 0
+    print(list(ll))                                                     # []
+
+    single_linked_from_list = LinkedList.from_iterable([1, 2, 3, 4])
+    single_linked_from_list.display()                                   # LinkedList: 1 -> 2 -> 3 -> 4
 
 
 if __name__ == "__main__":

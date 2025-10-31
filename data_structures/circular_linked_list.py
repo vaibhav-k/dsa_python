@@ -24,7 +24,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-20
+    2025-10-31
 """
 
 
@@ -62,6 +62,115 @@ class CircularLinkedList:
         self.head = None
         self.size = 0
 
+    def __len__(self):
+        """
+        Return the number of nodes in the circular linked list.
+        """
+        return self.size
+
+    def traverse(self):
+        """
+        Generator to iterate through the circular linked list.
+
+        Returns:
+            Yields each node's data in the list.
+        """
+        if self.head is None:
+            return
+
+        current = self.head
+        while True:
+            yield current.data
+            current = current.next
+            if current == self.head:
+                break
+
+    def __iter__(self):
+        """
+        Iterate over the circular linked list.
+        """
+        return self.traverse()
+
+    def find(self, data):
+        """
+        Find a node with the given data.
+
+        Args:
+            data: The value to search for in the list.
+
+        Returns:
+            bool: True if the node is found, False otherwise.
+        """
+        if self.head is None or data is None:
+            return False
+        current = self.head
+        while True:
+            if current.data == data:
+                return True
+            current = current.next
+            if current == self.head:
+                break
+        return False
+
+    def __contains__(self, data):
+        """
+        Check if a value is in the circular linked list.
+
+        Args:
+            data: The value to check for.
+
+        Returns:
+            bool: True if the value is found, False otherwise.
+        """
+        return self.find(data)
+
+    def __getitem__(self, index):
+        """
+        Get the data at the specified index.
+
+        Args:
+            index (int): The index of the node to retrieve.
+
+        Returns:
+            The data at the specified index.
+
+        Raises:
+            IndexError: If the index is out of bounds.
+        """
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+        if index < 0 or index >= self.size or self.size == 0:
+            raise IndexError("Index out of bounds")
+
+        current = self.head
+        for _ in range(index):
+            current = current.next
+        return current.data
+
+    def __setitem__(self, index, data):
+        """
+        Set the data at the specified index.
+
+        Args:
+            index (int): The index of the node to update.
+            data: The new value to set.
+
+        Raises:
+            IndexError: If the index is out of bounds.
+            TypeError: If the index is not an integer.
+        """
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+        if index < 0 or index >= self.size or self.size == 0:
+            raise IndexError("Index out of bounds")
+        if data is None:
+            return
+
+        current = self.head
+        for _ in range(index):
+            current = current.next
+        current.data = data
+
     def add(self, data):
         """
         Add a node with the given data to the list at the end.
@@ -72,7 +181,7 @@ class CircularLinkedList:
         Returns:
             None: Adds a new node to the circular linked list.
         """
-        if not data:
+        if data is None:
             return
         new_node = Node(data)
         if not self.head:
@@ -121,27 +230,10 @@ class CircularLinkedList:
                 return True
             prev = current
             current = current.next
-            if current is None:
+            if current == self.head:
                 break
 
         return False
-
-    def traverse(self):
-        """
-        Generator to iterate through the circular linked list.
-
-        Returns:
-            Yields each node's data in the list.
-        """
-        if not self.head:
-            return
-
-        current = self.head
-        while True:
-            yield current.data
-            current = current.next
-            if current == self.head:
-                break
 
     def to_list(self):
         """
@@ -171,34 +263,11 @@ class CircularLinkedList:
         """
         return self.size == 0
 
-    def find(self, data):
-        """
-        Find a node with the given data.
-
-        Args:
-            data: The value to search for in the list.
-
-        Returns:
-            bool: True if the node is found, False otherwise.
-        """
-        if not self.head:
-            return False
-
-        current = self.head
-        while True:
-            if current.data == data:
-                return True
-            current = current.next
-            if current == self.head:
-                break
-
-        return False
-
     def display(self):
         """
         Print the elements of the circular linked list.
         """
-        if not self.head:
+        if self.head is None:
             print("List is empty")
             return
 
@@ -213,86 +282,22 @@ class CircularLinkedList:
         print(" -> ".join(elements) + " (circular)")
 
     @classmethod
-    def from_list(cls, data_list):
+    def from_iterable(cls, iterable):
         """
-        Create a CircularLinkedList from a standard Python list.
+        Create a CircularLinkedList from any iterable.
 
         Args:
-            data_list (list): A list of values to be added to the circular linked list.
+            iterable: An iterable of values to be added to the circular linked list.
 
         Returns:
-            CircularLinkedList: A new circular linked list containing the elements from data_list.
+            CircularLinkedList: A new circular linked list containing the elements from the iterable.
         """
+        if iterable is None:
+            return cls()
         cll = cls()
-        for data in data_list:
+        for data in iterable:
             cll.add(data)
         return cll
-
-    def __len__(self):
-        """
-        Return the number of nodes in the circular linked list.
-        """
-        return self.size
-
-    def __contains__(self, data):
-        """
-        Check if a value is in the circular linked list.
-
-        Args:
-            data: The value to check for.
-
-        Returns:
-            bool: True if the value is found, False otherwise.
-        """
-        return self.find(data)
-
-    def __iter__(self):
-        """
-        Iterate over the circular linked list.
-        """
-        return self.traverse()
-
-    def __getitem__(self, index):
-        """
-        Get the data at the specified index.
-
-        Args:
-            index (int): The index of the node to retrieve.
-
-        Returns:
-            The data at the specified index.
-
-        Raises:
-            IndexError: If the index is out of bounds.
-        """
-        if index < 0 or index >= self.size:
-            raise IndexError("Index out of bounds")
-        if self.size == 0:
-            raise IndexError("Index out of bounds")
-
-        current = self.head
-        for _ in range(index):
-            current = current.next
-        return current.data
-
-    def __setitem__(self, index, data):
-        """
-        Set the data at the specified index.
-
-        Args:
-            index (int): The index of the node to update.
-            data: The new value to set.
-
-        Raises:
-            IndexError: If the index is out of bounds.
-        """
-        if index < 0 or index >= self.size:
-            raise IndexError("Index out of bounds")
-
-        current = self.head
-        for _ in range(index):
-            current = current.next
-        current.data = data
 
 
 def main():
@@ -303,14 +308,20 @@ def main():
     cll.add(1)
     cll.add(2)
     cll.add(3)
-    cll.display()                     # Output: 1 -> 2 -> 3 (circular)
-    print(f"Size: {len(cll)}")        # Output: Size: 3
+    cll.display()                                                   # Output: 1 -> 2 -> 3 (circular)
+    print(f"Size: {len(cll)}")                                      # Output: Size: 3
+
     cll.remove(2)
-    cll.display()                     # Output: 1 -> 3 (circular)
-    print(f"Contains 3: {3 in cll}")  # Output: Contains 3: True
-    print(f"Contains 2: {2 in cll}")  # Output: Contains 2: False
+    cll.display()                                                   # Output: 1 -> 3 (circular)
+
+    print(f"Contains 3: {3 in cll}")                                # Output: Contains 3: True
+    print(f"Contains 2: {2 in cll}")                                # Output: Contains 2: False
+
     cll.clear()
-    cll.display()                     # Output: List is empty
+    cll.display()                                                   # Output: List is empty
+
+    cll_from_list = CircularLinkedList.from_iterable([10, 20, 30])
+    cll_from_list.display()                                         # Output: 10 -> 20 -> 30 (circular)
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-14-20
+    2025-10-31
 """
 
 
@@ -63,6 +63,20 @@ class DoublyLinkedList:
         self.head = None
         self.tail = None
 
+    def to_list(self):
+        """
+        Convert the linked list to a Python list.
+
+        Returns:
+            list: List of node values.
+        """
+        result = []
+        current = self.head
+        while current:
+            result.append(current.data)
+            current = current.next
+        return result
+
     def __str__(self):
         """Return a string representation of the list."""
         return f"DoublyLinkedList: {' <-> '.join(map(str, self.to_list()))}"
@@ -90,7 +104,7 @@ class DoublyLinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
-        if not self.head or not data:  # Empty list or None data
+        if not self.head or data is None:  # Empty list or None data
             return False
         current = self.head
         while current:
@@ -109,16 +123,32 @@ class DoublyLinkedList:
         Returns:
             bool: True if found, False otherwise.
         """
-        if not self.head or not item:  # Empty list or None item
+        if not self.head or item is None:  # Empty list or None item
             return False
         return self.find(item)
 
     def __iter__(self):
-        """Iterate over the list from head to tail."""
+        """
+        Iterate over the list in forward direction (from head to tail).
+
+        This method does not support backward iteration. If you need to iterate from tail to head, use __reversed__
+        method.
+        """
         current = self.head
         while current:
             yield current.data
             current = current.next
+
+    def __reversed__(self):
+        """
+        Iterate over the list from tail to head.
+
+        This method allows backward iteration through the list.
+        """
+        current = self.tail
+        while current:
+            yield current.data
+            current = current.prev
 
     def __getitem__(self, index):
         """
@@ -133,15 +163,15 @@ class DoublyLinkedList:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0 or index >= self.size():
+        if (
+            not isinstance(index, int) or index < 0 or index >= self.size()
+        ):  # Invalid index
             raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
             if not current:
                 raise IndexError("list index out of range")
             current = current.next
-        if not current:
-            raise IndexError("list index out of range")
         return current.data
 
     def __setitem__(self, index, value):
@@ -155,15 +185,15 @@ class DoublyLinkedList:
         Raises:
             IndexError: If the index is out of range.
         """
-        if index < 0 or index >= self.size():
+        if (
+            not isinstance(index, int) or index < 0 or index >= self.size()
+        ):  # Invalid index
             raise IndexError("list index out of range")
         current = self.head
         for _ in range(index):
             if not current:
                 raise IndexError("list index out of range")
             current = current.next
-        if not current:
-            raise IndexError("list index out of range")
         current.data = value
 
     def append(self, data):
@@ -173,7 +203,7 @@ class DoublyLinkedList:
         Args:
             data: The value to be added.
         """
-        if not data:  # Ignore None or empty data
+        if data is None:  # Ignore None or empty data
             return
         new_node = Node(data)
         if not self.head:
@@ -190,7 +220,7 @@ class DoublyLinkedList:
         Args:
             data: The value to be added.
         """
-        if not data:  # Ignore None or empty data
+        if data is None:  # Ignore None or empty data
             return
         new_node = Node(data)
         if not self.head:
@@ -210,10 +240,8 @@ class DoublyLinkedList:
         Raises:
             ValueError: If the list is empty or data not found.
         """
-        if not self.head:
-            raise ValueError("List is empty")
-        if not data:
-            raise ValueError("Cannot delete None or empty data")
+        if not self.head or data is None:  # Empty list
+            raise ValueError("List is empty or data is None")
         current = self.head
         while current:
             if current.data == data:
@@ -234,35 +262,27 @@ class DoublyLinkedList:
         self.head = None
         self.tail = None
 
-    def to_list(self):
-        """
-        Convert the linked list to a Python list.
-
-        Returns:
-            list: List of node values.
-        """
-        result = []
-        current = self.head
-        while current:
-            result.append(current.data)
-            current = current.next
-        return result
-
     @classmethod
-    def from_list(cls, lst):
+    def from_iterable(cls, iterable):
         """
-        Create a doubly linked list from a Python list.
+        Create a doubly linked list from any iterable.
 
         Args:
-            lst (list): List of values.
+            iterable: An iterable of values.
+
+        Raises:
+            ValueError: If the input is None.
+            TypeError: If the input is not an iterable.
 
         Returns:
             DoublyLinkedList: Linked list containing the values.
         """
-        if not lst:  # Empty list
-            return cls()
+        if iterable is None:
+            raise ValueError("Input iterable cannot be None")
+        if not hasattr(iterable, "__iter__"):
+            raise TypeError("Input must be an iterable")
         dll = cls()
-        for item in lst:
+        for item in iterable:
             dll.append(item)
         return dll
 
@@ -276,6 +296,10 @@ class DoublyLinkedList:
         Returns:
             int: 1-based position, or -1 if not found.
         """
+        if data is None:  # Ignore None data
+            return -1
+        if self.size() == 0:
+            return -1
         current = self.head
         pos = 1
         while current:
@@ -292,6 +316,8 @@ class DoublyLinkedList:
         Args:
             iterable: Items to add.
         """
+        if iterable is None:
+            return
         for item in iterable:
             self.append(item)
 
@@ -300,13 +326,17 @@ class DoublyLinkedList:
         print(f"Forward: {' <-> '.join(map(str, self.to_list()))}")
 
     def display_backward(self):
-        """Print all nodes from tail to head."""
-        nodes = []
+        """Print all nodes from tail to head without extra space."""
+        print("Backward: ", end="")
         current = self.tail
+        first = True
         while current:
-            nodes.append(str(current.data))
+            if not first:
+                print(" <-> ", end="")
+            print(current.data, end="")
+            first = False
             current = current.prev
-        print(f"Backward: {' <-> '.join(nodes)}")
+        print()
 
 
 def main():
@@ -318,16 +348,24 @@ def main():
     dll.display_forward()  # Forward: 5 <-> 10 <-> 20
     dll.display_backward()  # Backward: 20 <-> 10 <-> 5
     print(dll.find(10))  # True
+    print(dll.find(15))  # False
+
     dll.delete(10)
     dll.display_forward()  # Forward: 5 <-> 20
     print(dll.size())  # 2
+
     dll.extend([30, 40])
     dll.display_forward()  # Forward: 5 <-> 20 <-> 30 <-> 40
     print(dll.search(40))  # 4
     print(dll.to_list())  # [5, 20, 30, 40]
+
     dll.clear()
     print(len(dll))  # 0
     print(list(dll))  # []
+
+    dll_from_list = DoublyLinkedList.from_iterable([1, 2, 3])
+    dll_from_list.display_forward()  # Forward: 1 <-> 2 <-> 3
+    dll_from_list.display_backward()  # Backward: 3 <-> 2 <-> 1
 
 
 if __name__ == "__main__":
