@@ -2,33 +2,40 @@
 algorithms.searching
 ====================
 
-This module provides implementations of common searching algorithms.
+This module provides implementations of common searching algorithms
+with robust error handling and inline documentation.
 
-Algorithms included:
+Each function includes detailed docstrings explaining the algorithm,
+its time and space complexity, and usage examples.
+
+Included Algorithms:
+--------------------
 - Linear Search
 - Binary Search
 - Jump Search
 - Exponential Search
 - Interpolation Search
 
-Functions:
-    linear_search(arr, target): Searches for a target value in an array using linear search.
-    binary_search(arr, target): Searches for a target value in a sorted array using binary search.
-    jump_search(arr, target): Searches for a target value in a sorted array using jump search.
-    exponential_search(arr, target): Searches for a target value in a sorted array using exponential search.
-    interpolation_search(arr, target): Searches for a target value in a sorted array using interpolation search.
-
 Author:
     Vaibhav Kulshrestha
 
 Date:
-    2025-10-17
+    2025-11-03
 """
+
+from math import sqrt
 
 
 def linear_search(arr, target):
     """
-    Searches for a target value in an array using linear search.
+    Performs a Linear Search for the target in the given array.
+
+    Algorithm:
+        - Traverse the list sequentially.
+        - Compare each element with the target until found.
+
+    Time Complexity: O(n)
+    Space Complexity: O(1)
 
     Args:
         arr (list): The list of elements to search.
@@ -38,17 +45,28 @@ def linear_search(arr, target):
         int: The index of the target if found, otherwise -1.
     """
     for index, value in enumerate(arr):
-        if value == target:
-            return index
+        try:
+            if value == target:  # Direct equality check
+                return index
+        except Exception as e:
+            # Handles cases like comparing incompatible types
+            raise ValueError(f"Comparison failed between {value} and {target}: {e}")
     return -1
 
 
 def binary_search(arr, target):
     """
-    Searches for a target value in a sorted array using binary search.
+    Performs a Binary Search for the target in a sorted array.
+
+    Algorithm:
+        - Repeatedly divide the search interval in half.
+        - Compare the middle element with the target.
+
+    Time Complexity: O(log n)
+    Space Complexity: O(1)
 
     Args:
-        arr (list): The sorted list of elements to search.
+        arr (list): A sorted list of elements.
         target: The value to search for.
 
     Returns:
@@ -57,36 +75,50 @@ def binary_search(arr, target):
     left, right = 0, len(arr) - 1
     while left <= right:
         mid = left + (right - left) // 2
-        if arr[mid] == target:
-            return mid
-        elif arr[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
+        try:
+            if arr[mid] == target:
+                return mid
+            elif arr[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        except Exception as e:
+            raise ValueError(f"Comparison failed at index {mid}: {e}")
     return -1
 
 
 def jump_search(arr, target):
     """
-    Searches for a target value in a sorted array using jump search.
+    Performs a Jump Search for the target in a sorted array.
+
+    Algorithm:
+        - Jump ahead by fixed steps (sqrt(n)) until the target is possibly found.
+        - Then perform linear search in that block.
+
+    Time Complexity: O(√n)
+    Space Complexity: O(1)
 
     Args:
-        arr (list): The sorted list of elements to search.
+        arr (list): A sorted list of elements.
         target: The value to search for.
 
     Returns:
         int: The index of the target if found, otherwise -1.
     """
-    from math import sqrt
-
     n = len(arr)
     if n == 0:
         return -1
+
     step = int(sqrt(n))
     prev = 0
 
-    # Find the block where the element may be present
-    while prev < n and arr[min(step, n) - 1] < target:
+    # Jump through the array to find a block that might contain the target
+    while prev < n:
+        try:
+            if arr[min(step, n) - 1] >= target:
+                break
+        except Exception as e:
+            raise ValueError(f"Comparison failed at jump index {min(step, n) - 1}: {e}")
         prev = step
         step += int(sqrt(n))
         if prev >= n:
@@ -94,47 +126,75 @@ def jump_search(arr, target):
 
     # Linear search within the block
     for i in range(prev, min(step, n)):
-        if arr[i] == target:
-            return i
+        try:
+            if arr[i] == target:
+                return i
+        except Exception as e:
+            raise ValueError(f"Comparison failed at index {i}: {e}")
     return -1
 
 
 def exponential_search(arr, target):
     """
-    Searches for a target value in a sorted array using exponential search.
+    Performs an Exponential Search for the target in a sorted array.
+
+    Algorithm:
+        - Find a range where the target might exist by doubling the index.
+        - Then perform Binary Search within that range.
+
+    Time Complexity: O(log n)
+    Space Complexity: O(1)
 
     Args:
-        arr (list): The sorted list of elements to search.
+        arr (list): A sorted list of elements.
         target: The value to search for.
 
     Returns:
         int: The index of the target if found, otherwise -1.
     """
-    if len(arr) == 0:
+    n = len(arr)
+    if n == 0:
         return -1
-    if arr[0] == target:
-        return 0
 
+    # Check the first element
+    try:
+        if arr[0] == target:
+            return 0
+    except Exception as e:
+        raise ValueError(f"Comparison failed at index 0: {e}")
+
+    # Find the range by exponential growth
     index = 1
-    while index < len(arr) and arr[index] <= target:
+    while index < n:
+        try:
+            if arr[index] > target:
+                break
+        except Exception as e:
+            raise ValueError(f"Comparison failed at index {index}: {e}")
         index *= 2
 
-    # Call binary search for the found range
+    # Define the range for binary search
     left = index // 2
-    right = min(index, len(arr) - 1)
-    return (
-        binary_search(arr[left : right + 1], target) + left
-        if binary_search(arr[left : right + 1], target) != -1
-        else -1
-    )
+    right = min(index, n - 1)
+
+    # Perform binary search on the range
+    result = binary_search(arr[left : right + 1], target)
+    return left + result if result != -1 else -1
 
 
 def interpolation_search(arr, target):
     """
-    Searches for a target value in a sorted array using interpolation search.
+    Performs an Interpolation Search for the target in a sorted, uniformly distributed array.
+
+    Algorithm:
+        - Estimate the position of the target based on its value.
+        - Adjust the search range based on the estimated position.
+
+    Time Complexity: O(log log n) on average, O(n) in worst case.
+    Space Complexity: O(1)
 
     Args:
-        arr (list): The sorted list of elements to search.
+        arr (list): A sorted list of uniformly distributed numeric elements.
         target: The value to search for.
 
     Returns:
@@ -143,26 +203,42 @@ def interpolation_search(arr, target):
     low = 0
     high = len(arr) - 1
 
-    while low <= high and arr[low] <= target <= arr[high]:
-        if low == high:
-            if arr[low] == target:
-                return low
+    while low <= high:
+        try:
+            # Avoid division by zero and ensure target is within range
+            if arr[low] == arr[high]:
+                if arr[low] == target:
+                    return low
+                return -1
+
+            # Estimate probable position
+            pos = low + int(
+                ((target - arr[low]) * (high - low)) / (arr[high] - arr[low])
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to estimate position due to type mismatch: {e}")
+
+        # Ensure the position is within bounds
+        if pos < 0 or pos >= len(arr):
             return -1
 
-        # Estimate the position
-        pos = low + ((target - arr[low]) * (high - low) // (arr[high] - arr[low]))
-
-        if arr[pos] == target:
-            return pos
-        if arr[pos] < target:
-            low = pos + 1
-        else:
-            high = pos - 1
+        try:
+            if arr[pos] == target:
+                return pos
+            elif arr[pos] < target:
+                low = pos + 1
+            else:
+                high = pos - 1
+        except Exception as e:
+            raise ValueError(f"Comparison failed at index {pos}: {e}")
 
     return -1
 
 
 def main():
+    """
+    Demonstrates usage of all search algorithms with example data.
+    """
     arr = [10, 20, 30, 40, 50, 60, 70, 80, 90]
     target = 70
 
